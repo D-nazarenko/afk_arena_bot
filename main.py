@@ -26,12 +26,10 @@ app = Flask(__name__)
 def home():
     return "Бот работает!"
 
-@app.route('/webhook', methods=['GET', 'POST'])
-def webhook():
-    if request.method == 'GET':
-        return "Webhook работает!", 200
-    update = types.Update.parse_raw(request.data)
-    asyncio.create_task(dp.process_update(update))
+@app.route('/webhook', methods=['POST'])
+async def webhook():
+    update = types.Update.parse_raw(await request.get_data())
+    await dp._router.feed_update(bot, update)
     return "ok", 200
 
 # Фоновый процесс для пинга
