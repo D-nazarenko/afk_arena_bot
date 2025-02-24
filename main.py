@@ -26,10 +26,12 @@ app = Flask(__name__)
 def home():
     return "Бот работает!"
 
-@app.route('/webhook', methods=['POST'])
-async def webhook():
+@app.route('/webhook', methods=['GET', 'POST'])
+def webhook():
+    if request.method == 'GET':
+        return "Webhook работает!", 200
     update = types.Update.parse_raw(request.data)
-    await dp.process_update(update)
+    asyncio.create_task(dp.process_update(update))
     return "ok", 200
 
 # Фоновый процесс для пинга
@@ -39,7 +41,7 @@ def ping():
             requests.get(WEBHOOK_URL)
         except Exception as e:
             logging.error(f"Ошибка пинга: {e}")
-        asyncio.sleep(300)  # Пинг каждые 5 минут
+        time.sleep(300)  # Пинг каждые 5 минут
 
 Thread(target=ping, daemon=True).start()
 
@@ -97,5 +99,5 @@ if __name__ == "__main__":
         except Exception as e:
             logging.error(f"Бот упал с ошибкой: {e}")
             logging.info("Перезапуск через 5 секунд...")
-            asyncio.sleep(5)
+            time.sleep(5)
             os.execv(sys.executable, ['python'] + sys.argv)
