@@ -15,6 +15,9 @@ ADMIN_ID = 430105072
 bot = Bot(token=TOKEN)
 dp = Dispatcher()
 
+bot.set_webhook()
+
+
 logging.basicConfig(level=logging.INFO)
 
 # Обработчик команды /start
