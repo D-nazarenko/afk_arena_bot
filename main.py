@@ -58,15 +58,13 @@ async def forward_to_admin(message: Message):
         await message.answer("Ваш вопрос отправлен админу. Ожидайте ответ.")
 
 async def main():
+    logging.info("Удаляем Webhook...")
     await bot.delete_webhook(drop_pending_updates=True)
+    logging.info("Webhook удалён, запускаем Polling")
     await dp.start_polling(bot)
 
 if __name__ == "__main__":
-    while True:
-        try:
-            asyncio.run(main())
-        except Exception as e:
-            logging.error(f"Бот упал с ошибкой: {e}")
-            logging.info("Перезапуск через 5 секунд...")
-            time.sleep(5)
-            os.execv(sys.executable, ['python'] + sys.argv)
+    try:
+        asyncio.run(main())
+    except Exception as e:
+        logging.error(f"Бот упал с ошибкой: {e}")
