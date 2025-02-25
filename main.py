@@ -1,21 +1,20 @@
 import asyncio
 import logging
+import os
+import sys
+import requests
 from aiogram import Bot, Dispatcher, types
 from aiogram.types import Message
 from aiogram.filters import CommandStart
-import os
 
-from keep_alive import keep_alive
-
-keep_alive()
+# Настройка логирования
+logging.basicConfig(level=logging.INFO)
 
 TOKEN = os.getenv("TOKEN")   
 ADMIN_ID = 430105072   
 
 bot = Bot(token=TOKEN)
 dp = Dispatcher()
-
-logging.basicConfig(level=logging.INFO)
 
 # Обработчик команды /start
 @dp.message(CommandStart())
@@ -48,7 +47,6 @@ async def forward_to_admin(message: Message):
                     logging.info(f"Ответ отправлен пользователю {user_id}")
                 except Exception as e:
                     await message.answer("Не удалось отправить сообщение. У пользователя скрытый профиль. Попросите его написать боту команду /start, чтобы разрешить сообщения от бота.")
-                    await bot.send_message(user_id, "Админ ответил на ваш вопрос, но ваш профиль скрыт. Пожалуйста, отправьте боту команду /start, чтобы получать ответы.")
                     logging.error(f"Ошибка отправки сообщения пользователю {user_id}: {e}")
             else:
                 await message.answer("Не удалось определить ID пользователя. Ответ невозможен.")
@@ -61,7 +59,15 @@ async def forward_to_admin(message: Message):
         await message.answer("Ваш вопрос отправлен админу. Ожидайте ответ.")
 
 async def main():
+    await bot.delete_webhook(drop_pending_updates=True)
     await dp.start_polling(bot)
 
 if __name__ == "__main__":
-    asyncio.run(main())
+    while True:
+        try:
+            asyncio.run(main())
+        except Exception as e:
+            logging.error(f"Бот упал с ошибкой: {e}")
+            logging.info("Перезапуск через 5 секунд...")
+            time.sleep(5)
+            os.execv(sys.executable, ['python'] + sys.argv)
