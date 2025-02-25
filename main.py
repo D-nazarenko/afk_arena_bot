@@ -2,7 +2,6 @@ import asyncio
 import logging
 import os
 import sys
-import requests
 from aiogram import Bot, Dispatcher, types
 from aiogram.types import Message
 from aiogram.filters import CommandStart
