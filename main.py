@@ -45,6 +45,8 @@ async def forward_to_admin(message: Message):
                         await bot.send_document(user_id, message.document.file_id, caption=message.caption or "Ответ от админа")
                     elif message.video:
                         await bot.send_video(user_id, message.video.file_id, caption=message.caption or "Ответ от админа")
+                    elif message.sticker:
+                        await bot.send_sticker(user_id, message.sticker.file_id)
                     logging.info(f"Ответ отправлен пользователю {user_id}")
                 except Exception as e:
                     await message.answer("Не удалось отправить сообщение. У пользователя скрытый профиль. Попросите его написать боту команду /start, чтобы разрешить сообщения от бота.")
